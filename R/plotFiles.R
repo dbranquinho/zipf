@@ -39,60 +39,60 @@ plotWords <- function(lfile, corte = 0) {
         return(corM)
 }
 
-plotFile <- function(file1 = file1, file2 = file2, wplot = TRUE, typePlot = "p") {
-        source("loadConfig.R")
+plotFile <- function(file1 = NULL, file2 = NULL, wplot = TRUE, typePlot = "p") {
+        loadConfig()
+        dirData <- config.get("dirData")
+        book_words <- read.table(file = paste0(dirData,"/Book_Words.csv"),
+                                 stringsAsFactors = FALSE)
         corM <- 0
-        if(!file.exists(paste0(index,"/",file1,".idx"))) {
-                return(sprintf("ERRO - %s not found",paste0(index,"/",file1,".idx")))
+        doc1  <- subset(book_words,file == file1)
+        centroid <- doc1$word
+        if(!is.null(file2)) {
+                doc2  <- subset(book_words,file == file2)
+                centroid <- c(doc1$word,doc2$word)
         }
-        if(!file.exists(paste0(index,"/",file2,".idx"))) {
-                return(sprintf("ERRO - %s not found",paste0(index,"/",file2,".idx")))
-        }
-        doc1  <- read.csv(paste0(index,"/",file1,".idx"),stringsAsFactors = FALSE,
-                          header = FALSE, col.names = c("term","tfidf"),
-                          sep = ";", encoding = "UTF-8")
-        doc2  <- read.csv(paste0(index,"/",file2,".idx"),stringsAsFactors = FALSE,
-                          header = FALSE, col.names = c("term","tfidf"),
-                          sep = ";", encoding = "UTF-8")
-        centroid <- c(doc1$term,doc2$term)
         centroid <- unique(sort(centroid))
-        ni <- data.frame(term = centroid, stringsAsFactors = FALSE)
+        ni <- data.frame(word = centroid, stringsAsFactors = FALSE)
+        remove(centroid)
         ni$tfidf <- 0
         ni$mean <- 0
         ni$i <- 0
         if(wplot) {
-                soma <- 0
-                for(i  in 1:length(doc1$term)[1]) {
-                        ind <- which(ni$term == doc1$term[i])
-                        ni$tfidf[ind] <- doc1$tfidf[i]
-                }
-                for(i  in 1:length(doc2$term)[1]) {
-                        ind <- which(ni$term == doc2$term[i])
-                        ni$mean[ind] <- doc2$tfidf[i]
+                ni$tfidf <- doc1[match(ni$word,doc1$word),"tf_idf"]
+                if(!is.null(file2)) {
+                        ni$mean <- doc2[match(ni$word,doc2$word),"tf_idf"]
                 }
                 ni <- subset(ni, tfidf > 0)
-                ni <- subset(ni, mean > 0)
-                if(length(ni$term) < 10) {
-                        return(paste0("File ",index,"/",file2,".idx has less than 10 characters"))
+                if(length(ni$word) < 5) {
+                        return(paste0("File ",file1," has less than 5 words to show",length(ni$word)))
                 }
-                ni <- ni[order(ni$mean,decreasing = FALSE),]
-                ni$i <- 1:length(ni$term)
-                model1 <- lm(ni$mean ~ ni$i + I(ni$i^2))
-                model2 <- lm(ni$tfidf ~ ni$i + I(ni$i^2))
-                corM <- abs(cor(predict(model1),predict(model2)))
-                plot(ni$i, ni$mean, col = "blue",
+                ni[is.na(ni)] <- 0
+                ni <- ni[order(ni$tfidf,decreasing = FALSE),]
+                ni$i <- 1:length(ni$word)
+                model1 <- lm(ni$tfidf ~ ni$i + I(ni$i^2))
+                corM <- 1
+                if(!is.null(file2)) {
+                        ni <- subset(ni, mean > 0)
+                        if(length(ni$word) < 5) {
+                                return(paste0("File ",file2," has less than 5 words to show ",length(ni$word)))
+                        }
+                        model1 <- lm(ni$tfidf ~ ni$i + I(ni$i^2))
+                        model2 <- lm(ni$mean ~ ni$i + I(ni$i^2))
+                        corM <- cor(predict(model1),predict(model2))
+                }
+                plot(ni$i, ni$tfidf, col = "blue",
                      type = "p", main = paste(file1,file2),
-                     xlim = c(0,max(ni$i)), ylim = c(0,max(ni$tfidf)),
+                     xlim = c(0,max(ni$i)), ylim = c(0,max(ni$tfidf,ni$mean)),
                      xlab = paste("correlation: ",corM), ylab = "TF-IDF")
-                lines(ni$i, predict(lm(ni$mean ~ ni$i + I(ni$i^2))), col = c("blue"))
-                #abline(lm(ni$mean ~ ni$i + I(ni$i^2)), col = "blue")
-                par(new = "T")
-                plot(ni$i, ni$tfidf, col = "red",
-                     pch = 16,
-                     xlim = c(0,max(ni$i)), ylim = c(0,max(ni$tfidf)),
-                     xlab = paste("correlation: ",corM), ylab = "TF-IDF")
-                lines(ni$i, predict(lm(ni$tfidf ~ ni$i + I(ni$i^2))), col = c("red"))
-                #abline(lm(ni$tfidf ~ ni$i + I(ni$i^2)), col = "red")
+                lines(ni$i, predict(model1), col = c("black"))
+                if(!is.null(file2)) {
+                        par(new = "T")
+                        plot(ni$i, ni$mean, col = "red",
+                             pch = 16,
+                             xlim = c(0,max(ni$i)), ylim = c(0,max(ni$tfidf,ni$mean)),
+                             xlab = paste("correlation: ",corM), ylab = "TF-IDF")
+                        lines(ni$i, predict(model2), col = c("green"))
+                }
                 return(corM)
         }
         return(c("ERRO",length(compare)[1]))
