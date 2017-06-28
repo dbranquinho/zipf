@@ -1,21 +1,3 @@
-
-get_tfidf <- function(lfile) {
-        loadConfig()
-        loadPackage("dplyr")
-        loadPackage("tidytext")
-        dirData <- config.get("dirData")
-
-        if(!file.exists(paste0(collection,"/",lfile))) {
-                return(sprintf("ERRO - %s not found",paste0(collection,"/",lfile)))
-        }
-        doc <- scan(paste0(collection,"/",lfile),what = "character",sep = "@")
-        doc <- gsub("[[:punct:]]", "", doc)
-        doc <- sapply(doc,paste())
-        book_words < doc %>% unnest_tokens(word, text) %>%
-                count(book, word, sort = TRUE) %>%
-                ungroup()
-}
-
 plotWords <- function(lfile, corte = 0) {
         source("loadConfig.R")
         library("ggplot2")
