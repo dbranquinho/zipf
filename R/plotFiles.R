@@ -1,42 +1,23 @@
-plotWords <- function(lfile, corte = 0) {
-        source("loadConfig.R")
-        library("ggplot2")
-        library("data.table")
-        if(!file.exists(paste0(collection,"/",lfile))) {
-                return(sprintf("ERRO - %s not found",paste0(collection,"/",lfile)))
-        }
-        if(!file.exists(paste0(index,"/",lfile,".idx"))) {
-                return(sprintf("ERRO - %s not found",paste0(index,"/",lfile,".idx")))
-        }
-        ni <- scan(paste0(collection,"/",lfile),what = "character")
-        temp <- tolower(ni)
-        temp <- gsub("[[:digit:]]", "", temp)
-        temp <- gsub("[[:punct:]]", "", temp)
-        temp = gsub("[ \t]{2,}", " ", temp)
-        temp = gsub("^\\s+|\\s+$", "", temp)
-        ni <- data.frame(i = 1:length(temp), term = temp,stringsAsFactors = FALSE)
-        ni$mean <- 0
-        doc <- read.csv(paste0(index,"/",lfile,".idx"),
-                        stringsAsFactors = FALSE,encoding = "UTF-8",sep = ";",
-                        header = FALSE,col.names = c("term","tfidf"))
-        doc <- subset(doc, tfidf > corte)
-        doc$i <- 1:length(doc$term)
-        ni <- data.table(ni)
+plotWords <- function(lfile, maxWords = 100, cut = 0) {
+        loadConfig()
+        loadPackage("data.table")
+        loadPackage("ggplot2")
+        loadPackage("wordcloud")
+        dirData <- config.get("dirData")
+        book_words <- read.table(file = paste0(dirData,"/Book_Words.csv"),
+                                 stringsAsFactors = FALSE)
+        corM <- 0
+        doc  <- subset(book_words,file == lfile)
+        doc <- subset(doc, tf_idf > cut)
+        doc$i <- 1:length(doc$word)
         doc <- data.table(doc)
-        setkey(doc,term)
-        setkey(ni,term)
-        #ni <- ni[order(ni$mean,decreasing = FALSE),]
-        sapply(doc$term, function(i) {
-                ni[i]$mean <- doc[i]$tfidf
-        })
-        if(dim(doc)[1] > 50)
-                doc <- doc[1:50,]
-        p <- ggplot(ni, aes(i, mean, label = ni$term)) +
-                geom_text(check_overlap = TRUE,size = ni$mean, aes(colour = ni$mean)) +
-                theme(legend.position="none")
-        print(p)
-        corM <- lm(ni$mean ~ ni$i + I(ni$i^2))
-        return(corM)
+        setkey(doc,word)
+        doc <- doc[order(doc$tf_idf, decreasing = TRUE),]
+        if(dim(doc)[1] > 100)
+                doc <- doc[1:100,]
+        wordcloud(doc$word,doc$tf_idf, scale=c(max(doc$tf_idf)+3,min(doc$tf_idf)),min.freq=0.01,
+                  max.words=100, random.order=FALSE, rot.per=.35,
+                  colors=brewer.pal(8,"Dark2"))
 }
 
 plotFile <- function(file1 = NULL, file2 = NULL, wplot = TRUE, typePlot = "p") {
