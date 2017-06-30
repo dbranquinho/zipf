@@ -9,7 +9,7 @@ plotClassAll <- function(compare = NULL, corteG = 0) {
         classes <- list.files((myClass))
         myClasses <- as.character(lapply(paste0(classes),FUN = paste0))
         return(lapply(myClasses,wplot = TRUE,compare = compare, multiPlot = TRUE,
-                      corte = corteG, interact = FALSE, FUN = plotClass))
+                      cut = corteG, interact = FALSE, FUN = plotClass))
 }
 
 plotClass <- function(classe = NULL, compare = NULL, all = FALSE,
@@ -36,14 +36,15 @@ plotClass <- function(classe = NULL, compare = NULL, all = FALSE,
         if(wplot) {
                 ni$tfidf <- 0
                 if(length(compare)[1] == 0) {
-                        ni <- subset(ni, mean > corte)
-                        ni$i <- 1:length(ni$word)
+                        ni <- subset(ni, mean > cut)
                         ni <- ni[order(ni$mean,decreasing = FALSE),]
+                        ni$i <- 1:length(ni$word)
                         par(new = "F")
                         plot(ni$i, ni$mean, col = "blue", xlim = c(0,max(ni$i)),
-                             ylim = c(0,max(ni$mean)), type = typePlot, main = lfile,
+                             ylim = c(0,max(ni$mean)), type = typePlot, main = classe,
                              xlab = "Terms", ylab = "TF-IDF")
-                        lines(ni$i, predict(lm(ni$mean ~ ni$i + I(ni$i^2))), col = c("red"))
+                        lines(ni$i, predict(lm(ni$mean ~ ni$i + I(ni$i^2))),
+                              col = c("red"),lwd = 2)
                         corM <- lm(ni$mean ~ ni$i + I(ni$i^2))
                         return(corM)
                 }

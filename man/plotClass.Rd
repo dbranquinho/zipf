@@ -72,8 +72,12 @@ Delermando Branquinho Filho
 
 \seealso{
 %% ~~objects to See Also as \code{\link{help}}, ~~~
+plotFile()
 }
+
 \examples{
+> plotClass(classe = "at2", compare = "004062006at2.txt")
+[1] 0.9997294
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
