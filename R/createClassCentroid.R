@@ -19,6 +19,7 @@ createClassCentroid <- function(kfold = .7) {
         loadConfig()
         myClass <- config.get("myClass")
         dirData <- config.get("dirData")
+        loadPackage("data.table")
         classes <- read.csv(paste0(dirData,"/class.txt"),
                             stringsAsFactors = FALSE, header = TRUE)
         book_words <- read.table(file = paste0(dirData,"/Book_Words.csv"),
@@ -35,11 +36,13 @@ createClassCentroid <- function(kfold = .7) {
                 colnames(centroid) <- c("word")
                 setkey(centroid,word)
                 centroid$mean <- 0
-                centroid <- sapply(centroid$word, function(myword) {
+                lixo <- sapply(centroid$word, function(myword) {
                         centroid[myword,2] <-
                                 mean(subClass[which(subClass$word == myword),]$tf_idf)
                 })
-                write.table(centroid,paste0(dirData,"/centroid.",classe))
+                centroid <- setDT(centroid, keep.rownames = FALSE)[]
+                colnames(centroid) <- c("word","mean")
+                write.csv(centroid,paste0(dirData,"/centroid.",classe))
                 remove(centroid,subClass,nfiles,files)
         }
         createFiles2Test(kfold)
