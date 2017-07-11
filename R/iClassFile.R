@@ -261,30 +261,37 @@ iCLassFileAll <- function(class = FALSE, iniFile = 0, maxFiles = 9999999, clean 
 }
 
 iClassFile <- function(lfile = lfile, wplot = FALSE) {
-        source("loadConfig.R")
-        if(!file.exists(lfile)) {
-                return(sprintf("ERROR - File %s not found",lfile))
-        }
+        loadConfig()
+        dirData <- config.get("dirData")
+        myClass <- config.get("myClass")
+        book_words <- read.table(file = paste0(dirData,"/Book_Words.csv"),
+                                 stringsAsFactors = FALSE)
+        corM <- 0
+        doc  <- subset(book_words,file == lfile)
         doc3 <- "none"
         rho  <- -999999
         rhoClass <- "none"
-        lClasses <- list.files(statistic)
-        response <- data.frame(lClasses)
+        lClasses <- read.csv(paste0(dirData,"/class.txt"),
+                                        stringsAsFactors = FALSE, header = TRUE)
+        response <- data.frame(lClasses$class)
         response$cor <- 0
-        doc  <- read.csv(lfile,stringsAsFactors = FALSE, header = FALSE,
-                         col.names = c("term","tfidf"),sep = ";", encoding = "UTF-8")
-        if(length(doc$term)[1] < 10)
+        if(length(doc$word)[1] < 10)
                 return(list(response,c(rhoClass,rho)))
-        for(niFiles in list.files(statistic)) {
-                ni <- read.csv(paste0(statistic,"/",niFiles),stringsAsFactors = FALSE)
+        for(niFiles in list.files(dirData,pattern = "centroid*")) {
+                ni <- read.csv(paste0(dirData,"/",niFiles), stringsAsFactors = FALSE)
                 ni$tfidf <- 0
                 soma<-0
-                total<-length(ni$term)[1]
-                ni$tfidf <- doc[match(ni$term,doc$term),"tfidf"]
-                ni <- subset(ni, tfidf > 0)
+                total<-length(ni$word)[1]
+                ni$tfidf <- doc[match(ni$word,doc$word),"tf_idf"]
+                ni[is.na(ni)] <- 0
                 ni <- ni[order(ni$mean,decreasing = FALSE),]
-                ni$i <- 1:length(ni$term)
+                ni <- subset(ni, tfidf > 0)
                 ni <- subset(ni, mean > 0)
+                if(length(ni$word)[1] < 10) {
+                        print(paste("Class ",niFiles," less than 10"))
+                        next
+                }
+                ni$i <- 1:length(ni$word)
                 model1 <- lm(ni$mean ~ ni$i + I(ni$i^2))
                 model2 <- lm(ni$tfidf ~ ni$i + I(ni$i^2))
                 corr <- abs(cor(predict(model1),predict(model2)))

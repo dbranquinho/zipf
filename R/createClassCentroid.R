@@ -37,13 +37,12 @@ createClassCentroid <- function(kfold = .7) {
                 setkey(centroid,word)
                 centroid$mean <- 0
                 lixo <- sapply(centroid$word, function(myword) {
-                        centroid[myword,2] <-
+                        centroid[myword,2] <<-
                                 mean(subClass[which(subClass$word == myword),]$tf_idf)
                 })
                 centroid <- setDT(centroid, keep.rownames = FALSE)[]
-                colnames(centroid) <- c("word","mean")
                 write.csv(centroid,paste0(dirData,"/centroid.",classe))
-                remove(centroid,subClass,nfiles,files)
+                remove(centroid,subClass,nfiles,files,lixo)
         }
         createFiles2Test(kfold)
 }
