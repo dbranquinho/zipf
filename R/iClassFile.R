@@ -278,7 +278,8 @@ iClassFile <- function(lfile = lfile, wplot = FALSE) {
         if(length(doc$word)[1] < 10)
                 return(list(response,c(rhoClass,rho)))
         for(niFiles in list.files(dirData,pattern = "centroid*")) {
-                ni <- read.csv(paste0(dirData,"/",niFiles), stringsAsFactors = FALSE)
+                ni <- read.csv(paste0(dirData,"/",niFiles), encoding = "UTF-8",
+                                 stringsAsFactors = FALSE, header = TRUE)
                 ni$tfidf <- 0
                 soma<-0
                 total<-length(ni$word)[1]
@@ -291,14 +292,15 @@ iClassFile <- function(lfile = lfile, wplot = FALSE) {
                         print(paste("Class ",niFiles," less than 10"))
                         next
                 }
+                iClass <- substr(niFiles,nchar(niFiles)-2,nchar(niFiles))
                 ni$i <- 1:length(ni$word)
                 model1 <- lm(ni$mean ~ ni$i + I(ni$i^2))
                 model2 <- lm(ni$tfidf ~ ni$i + I(ni$i^2))
                 corr <- abs(cor(predict(model1),predict(model2)))
-                response$cor[which(response$lClasses == niFiles)] <- corr
+                response$cor[which(response$lClasses == iClass)] <- corr
                 if(corr > rho) {
                         rho <- corr
-                        rhoClass <- niFiles
+                        rhoClass <- iClass
                         doc3<-ni
                 }
         }
@@ -309,13 +311,15 @@ iClassFile <- function(lfile = lfile, wplot = FALSE) {
                 maxylim<-as.numeric(maxylim)
                 plot(doc3$i, doc3$mean, col = "blue",
                      type = "p", main = rhoClass,
-                     xlim = c(0,max(doc3$i)), ylim = c(0,maxylim+5),
+                     xlim = c(0,max(doc3$i)), ylim = c(0,maxylim),
                      xlab = "Terms", ylab = "TF-IDF/Mean")
                 lines(doc3$i, predict(lm(doc3$mean ~ doc3$i + I(doc3$i^2))), col = c("blue"))
+                legend("topleft", legend=c(paste("class:",rhoClass),lfile,paste("Correlation:",rho)),
+                       col=c("blue","red","white"), lty=1:1, cex=0.8,box.lty=0)
                 par(new=T)
                 plot(doc3$i, doc3$tfidf, col = "red",
-                     pch = 16, xlim = c(0,max(doc3$i)), ylim = c(0,maxylim+5),
-                     xlab = "Terms", ylab = "TF-IDF/Mean")
+                     pch = 16, xlim = c(0,max(doc3$i)), ylim = c(0,maxylim),
+                     xlab = "Words", ylab = "TF-IDF/Mean")
                 lines(doc3$i, predict(lm(doc3$tfidf ~ doc3$i + I(doc3$i^2))), col = c("red"))
         }
         response <- response[order(response$cor,decreasing = TRUE),]
