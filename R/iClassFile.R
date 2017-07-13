@@ -32,12 +32,13 @@ createCorrelation <- function(class = FALSE, clean = FALSE, max = Inf) {
         classe <- read.csv(paste0(dirData,"/class.txt"),
                             stringsAsFactors = FALSE, header = TRUE)
         if(class == FALSE) {
-                names(classes)<-"Choose one Class"
-                return(classes)
+                names(classe)<-"Choose one Class"
+                return(classe)
         }
-        if(is.numeric(class)) {
+        if(is.numeric(class))
                 classe<-as.character(classe[[2]])[class]
-        }
+         else
+                classe <- class
         if(clean == TRUE) {
                 if(!dir.exists("./correlation"))
                         dir.create("./correlation")
@@ -48,22 +49,21 @@ createCorrelation <- function(class = FALSE, clean = FALSE, max = Inf) {
         ni$tfidf <- 0
         ni <- ni[order(ni$mean,decreasing = FALSE),]
         ni$i <- 1:length(ni$word)
-        result<-data.frame(stringsAsFactors = FALSE, Filename = NULL,
+        result <- data.frame(stringsAsFactors = FALSE, Filename = NULL,
                            Correlation = NULL)
         nibkp<-ni
         soma<-0
         cor7<-0
-        for(lfile in list.files(paste0(myClass,"/",classe))) {
+        classes <- read.csv(paste0(dirData,"/class.txt"),
+                            stringsAsFactors = FALSE, header = TRUE)
+        for(lfile in classes$class) {
                 soma=soma+1
                 if(soma > max)
                         break
-                doc  <- read.csv(paste0(index,"/",lfile,".idx"),stringsAsFactors = FALSE, header = FALSE,
-                                 col.names = c("term","tfidf"),sep = ";", encoding = "UTF-8")
-                if(file.info(paste0(index,"/",lfile,".idx"))$size == 1) {
-                        printf("%5s - %15s empty", soma,lfile)
-                        next
-                }
-                if(length(doc$term)[1] < 10) {
+                book_words <- read.table(file = paste0(dirData,"/Book_Words.csv"),
+                                         stringsAsFactors = FALSE)
+                doc  <- subset(book_words,file == lfile)
+                if(length(doc$word)[1] < 10) {
                         printf("%5s - %15s length < 10", soma,lfile)
                         next
                 }
