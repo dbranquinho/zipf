@@ -25,20 +25,20 @@ showCorrelation <- function(class = FALSE, maxFile = 6, corte = Inf) {
 }
 
 
-createCorrelation <- function(class = FALSE, clean = FALSE, max = Inf) {
+createCorrelation <- function(iclass = FALSE, clean = FALSE, max = Inf) {
         loadConfig()
         myClass <- config.get("myClass")
         dirData <- config.get("dirData")
         classe <- read.csv(paste0(dirData,"/class.txt"),
                             stringsAsFactors = FALSE, header = TRUE)
-        if(class == FALSE) {
+        if(iclass == FALSE) {
                 names(classe)<-"Choose one Class"
                 return(classe)
         }
-        if(is.numeric(class))
-                classe<-as.character(classe[[2]])[class]
+        if(is.numeric(iclass))
+                classe<-as.character(classe[[2]])[iclass]
          else
-                classe <- class
+                classe <- iclass
         if(clean == TRUE) {
                 if(!dir.exists("./correlation"))
                         dir.create("./correlation")
