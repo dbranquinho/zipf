@@ -56,12 +56,12 @@ createCorrelation <- function(class = FALSE, clean = FALSE, max = Inf) {
         cor7<-0
         classes <- read.csv(paste0(dirData,"/class.txt"),
                             stringsAsFactors = FALSE, header = TRUE)
+        book_words <- read.table(file = paste0(dirData,"/Book_Words.csv"),
+                                 stringsAsFactors = FALSE)
         for(lfile in classes$class) {
                 soma=soma+1
                 if(soma > max)
                         break
-                book_words <- read.table(file = paste0(dirData,"/Book_Words.csv"),
-                                         stringsAsFactors = FALSE)
                 doc  <- subset(book_words,file == lfile)
                 if(length(doc$word)[1] < 10) {
                         printf("%5s - %15s length < 10", soma,lfile)
