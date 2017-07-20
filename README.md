@@ -1,2 +1,2 @@
 # zipf
-Zipf law text classification
+Zipf law text classification and clusterization
