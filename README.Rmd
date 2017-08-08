@@ -1,0 +1,19 @@
+---
+title: "Zipf's law Algorithm"
+subtitle: "Text Mining for Classification and Clusterization"
+author: "Delermando Branquinho Filho"
+date: "20 de abril de 2016"
+output: html_document
+#output: md_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This is a library created as a package in Language R. Its purpose is to classify text documents. The application's Intelligence can perceive the subject being discussed in the texts and evaluate the distance to other documents.
+
+Distance from documents is a metric based on Zipf's Law, an empirical law formulated using mathematical statistics that refers to the fact that many types of data studied in the physical and social sciences can be approximated with a Zipfian distribution, one of a family of related discrete power law probability distributions. The law is named after the American linguist George Kingsley Zipf (1902–1950), who popularized it and sought to explain it (Zipf 1935, 1949), though he did not claim to have originated it.[1] The French stenographer Jean-Baptiste Estoup (1868–1950) appears to have noticed the regularity before Zipf. It was also noted in 1913 by German physicist Felix Auerbach (1856–1933).
+
