@@ -72,8 +72,8 @@ statistically classify the inferred files to the algorithm.
 
 ### Conclusion
 
-Temos 72% de precisão para classes de separação difíceis, mas outros
-documentos com boa separação obtivemos 92%, esse é um bom resultado para
-taxas de precisão.
+We have 72% accuracy for hard separation classes, but other documents
+with good separation we got 92%, that's a good result to precision
+rates.
 
 <BR> [The Scientist](http://www.thescientist.com.br) <BR><BR>
