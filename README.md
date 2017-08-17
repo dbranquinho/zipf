@@ -27,6 +27,12 @@ After transforming the words (terms) of the text into TF-IDF metrics,
 the algorithm creates sparse vectors to calculate the distances by the
 Zipf's Law.
 
+This package can be install from RStudio line command:
+
+install\_github("dbranquinho/zipf")
+
+------------------------------------------------------------------------
+
 The Dataset
 -----------
 

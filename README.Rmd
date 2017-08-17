@@ -20,6 +20,12 @@ The simplicity of the algorithm is its great attraction. Speed is a consequence 
 
 After transforming the words (terms) of the text into TF-IDF metrics, the algorithm creates sparse vectors to calculate the distances by the Zipf's Law.
 
+This package can be install from RStudio line command:
+
+install_github("dbranquinho/zipf")
+
+---
+
 ## The Dataset
 
 The "Tribuna" database is of journalistic origin with its digital publication, a factor that may be important for professionals of the area, also serving to understand other similar datasets. In order to carry out the experiment, we adopted the "A Tribuna" database, whose main characteristics presented previously, show that the collection is a good source of research, since it is already classified by specialists and has 21 classes that can be Displayed in the table below.
