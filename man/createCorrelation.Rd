@@ -16,12 +16,15 @@ createCorrelation(iclass = FALSE, clean = FALSE, max = Inf)
 \arguments{
   \item{iclass}{
 %%     ~~Describe \code{iclass} here~~
+What class do yuou want to create correlation
 }
   \item{clean}{
 %%     ~~Describe \code{clean} here~~
+If you want to clean last results
 }
   \item{max}{
 %%     ~~Describe \code{max} here~~
+Maximum itens to load
 }
 }
 \details{
@@ -39,6 +42,7 @@ createCorrelation(iclass = FALSE, clean = FALSE, max = Inf)
 }
 \author{
 %%  ~~who you are~~
+Delermando Branquinho Filho
 }
 \note{
 %%  ~~further notes~~
